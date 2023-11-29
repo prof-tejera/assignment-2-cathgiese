@@ -1,3 +1,4 @@
+import React from 'react'
 import "./Selector.css";
 
 const Selector = ({ label, numbers, ...selectProps }) => {

@@ -1,75 +1,101 @@
-import { useState, useEffect } from "react";
+import React from 'react'
+import styled from "styled-components";
+import { useState, useEffect, useContext } from "react";
 import Button from "../generic/Button/Button";
 import DisplayTime from "../generic/DisplayTime/DisplayTime";
 import Panel from "../generic/Panel";
-import Selector from "../generic/Selector/Selector";
+import { TimerContext } from '../../TimerProvider';
 
-const Stopwatch = () => {
+const Delete = styled.div`
+  display: flex;
+  justify-content: right;
+`;
+
+const Stopwatch = ({minutes, seconds, id, status}) => {
     // Store the time and button
-    const [isRunning, setIsRunning] = useState(null);
+    // const [isRunning, setIsRunning] = useState(null);
+    const {isRunning, setIsRunning, timers, setTimers} = useContext(TimerContext)
     const [time, setTime] = useState(0);
-    const [min, setMinutes] = useState(null);
-    const [sec, setSeconds] = useState(null);
 
     // Credit for setInterval & math.floor:
     // https://medium.com/how-to-react/simple-way-to-create-a-stopwatch-in-react-js-bcc0e08e041e
-    useEffect(() => {
+
+     useEffect(() => {
         let intervalId;
-        if (isRunning && time !== min + sec) {
+        if (status === "running") {
+            setIsRunning(true)
+        }   
+        if (isRunning && time <= (minutes + seconds)) {
           // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-          intervalId = setInterval(() => setTime(time + 1), 10);
+          intervalId = setInterval(() => setTime(time + 1), 7);
+         }
+
+         if (time >= (minutes + seconds)) {
+            // setWorkoutStatus(null);
+            setIsRunning(null);
+            const timer = timers.filter((timer) => timer.id === id)
+            timer[0].status = "complete"
+            clearInterval(intervalId);
         }
         return () => clearInterval(intervalId);
         
-      }, [isRunning, time, min, sec]);
+      }, [isRunning, setIsRunning, time, minutes, seconds, id, status, timers]);
 
-    // Minutes calculation
-    const minutes = Math.floor((time % 360000) / 6000);
+    
+    // // Minutes calculation
+    const minutesCalc = Math.floor((time % 360000) / 6000);
 
     // Seconds calculation
-    const seconds = Math.floor((time % 6000) / 100);
+    const secondsCalc = Math.floor((time % 6000) / 100);
 
-    // Start and stop timer
-    const startStop = () => {
-        if (isRunning) {
-            setIsRunning(null)
-        } else {
-            setIsRunning(true)
-        }
-    }
-    console.log(isRunning, time)
+    // // Start and stop timer
+    // const startStop = () => {
+    //     if (isRunning) {
+    //         setIsRunning(null)
+    //     } else {
+    //         setIsRunning(true)
+    //     }
+    // }
 
     const reset = () => {
         setIsRunning(null);
-        setTime(0)
+        setTime(0);
     }
 
-    // Show 59 numbers for minutes and seconds
-    const numbersList = [...Array(60).keys()]
-    const numbers = numbersList.map(number =>
-        <option value={number} key={number}>{number}</option>)
+    const remove = () => {
+        const newTimersList = timers.filter(timer => timer.id !== id)
+        setTimers(newTimersList)
+    }
+
+    // // Fast forward (clear) timer
+    // const fastForward = () => {
+    //     setTime(0)
+    // }
     
     return (
         <div className="grid-container">
         <Panel background-color="blue">
-            <Selector 
-                label="min"
-                onChange={e => setMinutes(e.target.value*6000)}
-                numbers={numbers}/>
-            <Selector 
-                label="sec"
-                onChange={e => setSeconds(e.target.value*100)}
-                numbers={numbers}/>
+            <Delete>
+                <Button 
+                    text="-"
+                    color={isRunning ? "hidden":"Default-button Button-danger"}
+                    onClick={remove}/>
+            </Delete>
+            Stopwatch: {minutes/6000}m{seconds/100}s
             <DisplayTime
-                minutes={minutes}
-                seconds={seconds}/>
+                minutes={minutesCalc}
+                seconds={secondsCalc}/>
         
-            <Button 
+            {/* <Button 
                 text={isRunning ? "Pause" : "Start"}
-                onClick={startStop}/>
+                onClick={startStop}/> */}
             <Button 
                 text="Reset"
-                onClick={reset}/>
+                onClick={reset}
+                color={"Default-button"}/>
+            {/* <Button 
+                text=">>"
+                onClick={fastForward}/> */}
         </Panel>
         </div>
     )

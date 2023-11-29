@@ -1,3 +1,5 @@
+import React from "react";
+
 const Screen = ({ minutes, seconds }) => {
     return (
       <div

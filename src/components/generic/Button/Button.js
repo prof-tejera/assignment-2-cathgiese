@@ -1,9 +1,10 @@
+import React from 'react'
 import "./Button.css";
 
-const Button = ({ active, text, ...btnProps }) => {
+const Button = ({ color, text, ...btnProps }) => {
   return (
-    <button
-      className={active ? "Default-button Default-button-active" : "Default-button"}
+    <button 
+      className={color}
       {...btnProps}
     >
       {text}

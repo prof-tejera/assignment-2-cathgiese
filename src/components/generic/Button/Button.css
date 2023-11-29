@@ -18,3 +18,19 @@
   .Default-button:hover {
     background-color: rgb(71, 145, 241);
   }
+
+  .Button-danger {
+    background-color: #d9534f 
+  }
+
+  .Button-go {
+    background-color: #4a9700
+  }
+
+  .Button-add {
+    border: solid;
+  }
+
+  .hidden {
+    display: none;
+  }

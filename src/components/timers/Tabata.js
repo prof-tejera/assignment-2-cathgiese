@@ -1,110 +1,117 @@
-import { useState, useEffect } from "react";
+import React from 'react'
+import styled from "styled-components";
+import { useState, useEffect, useContext } from "react";
 import Button from "../generic/Button/Button";
 import DisplayTime from "../generic/DisplayTime/DisplayTime";
 import Panel from "../generic/Panel";
-import Selector from "../generic/Selector/Selector";
+import { TimerContext } from '../../TimerProvider';
 
-const Tabata = () => {
+const Delete = styled.div`
+  display: flex;
+  justify-content: right;`;
+
+const Tabata = ({work, rest, rounds, id}) => {
     // Store the time and button
-    const [isRunning, setIsRunning] = useState(null);
+    const {isRunning, setIsRunning, timers, setTimers} = useContext(TimerContext)
     const [time, setTime] = useState(0);
-    const [workCount, setWorkCount] = useState(0);
-    const [restCount, setRestCount] = useState(0);
-    const [rounds, setRounds] = useState(0);
     const [roundsCount, setRoundsCount] = useState(0)
     const [workStatus, setWorkStatus] = useState(null)
 
     useEffect(() => {
         let intervalId;
 
-        if (isRunning && time !==0 && rounds > 0) {
-            // setting time from 0 to 1 every 10 millisecond using javascript setInterval method
-            intervalId = setInterval(() => setTime(time - 1), 10);
-            }
-        if (isRunning && workStatus && time === 0 && rounds > 0) {
-            setTime(restCount+99)
-            setWorkStatus(null)
-            intervalId = setInterval(() => setTime(time - 1), 10);
-        }
-        else if (isRunning && workStatus === null && time === 0 && rounds > 0) {
-            setTime(workCount+99 )
+        if (!isRunning && time === 0){
+            setTime(work)
+            setRoundsCount(rounds)
             setWorkStatus(true)
-            setRounds(rounds-1) 
-            intervalId = setInterval(() => setTime(time - 1), 10);
+        }
+
+        if (isRunning && time !==0 && roundsCount > 0) {
+            // setting time from 0 to 1 every 10 millisecond using javascript setInterval method
+            intervalId = setInterval(() => setTime(time - 1), 7);
+            }
+
+        if (isRunning && workStatus && time === 0 && roundsCount > 0) {
+            setTime(rest+99)
+            setWorkStatus(null)
+            intervalId = setInterval(() => setTime(time - 1), 7);
+        }
+
+        if (isRunning && workStatus === null && time === 0 && roundsCount > 0) {
+            setTime(work+99 )
+            setWorkStatus(true)
+            setRoundsCount(roundsCount-1) 
+            intervalId = setInterval(() => setTime(time - 1), 7);
+        }
+        
+        if(roundsCount === 0){
+            setTime(0)
+            setIsRunning(null)
         }
 
         return () => clearInterval(intervalId);
 
-      }, [isRunning, workStatus, time, rounds, restCount, workCount]);
+      }, [isRunning, setIsRunning, workStatus, time, rounds, work, rest, roundsCount]);
  
     // Seconds calculation
     const seconds = Math.floor((time % 6000) / 100);
 
-    // Start and stop timer
-    const startStop = () => {
-        if (isRunning) {
-            setIsRunning(null)
-        } else {
-            setIsRunning(true)
-        }
-    }
+    // // Start and stop timer
+    // const startStop = () => {
+    //     if (isRunning) {
+    //         setIsRunning(null)
+    //     } else {
+    //         setIsRunning(true)
+    //     }
+    // }
 
-    // Store rounds
-    const handleRounds = e => {
-        setRoundsCount(e.target.value)
-        setRounds(e.target.value)
-    }
+    // // Store rounds
+    // const handleRounds = e => {
+    //     setRoundsCount(e.target.value)
+    //     setRounds(e.target.value)
+    // }
 
     // Reset timer
     const reset = () => {
         setIsRunning(null);
-        setTime(workCount)
-        setRounds(roundsCount)
+        setTime(work)
+        setRoundsCount(rounds)
     }
 
-    // Fast forward (clear) timer
-    const fastForward = () => {
-        setTime(0)
-        setRounds(0)
+    const remove = () => {
+        const newTimersList = timers.filter(timer => timer.id !== id)
+        setTimers(newTimersList)
     }
 
-    // Show 59 numbers for minutes and seconds
-    const timeNumbersList = [...Array(60).keys()]
-    const timeNumbers = timeNumbersList.map(number =>
-        <option value={number} key={number}>{number}</option>)
-
-    // Show max 30 rounds
-    const roundNumbersList = [...Array(31).keys()]
-    const roundNumbers = roundNumbersList.map(number =>
-        <option value={number} key={number}>{number}</option>)
+    // // Fast forward (clear) timer
+    // const fastForward = () => {
+    //     setTime(0)
+    //     setRoundsCount(0)
+    // }
 
     return (
     <div className="grid-container">
         <Panel background-color="blue">
-        <Selector 
-            label="sec"
-            onChange={e => setWorkCount(e.target.value*100)}
-            numbers={timeNumbers}/>
-        <Selector 
-            label="sec"
-            onChange={e => setRestCount(e.target.value*100)}
-            numbers={timeNumbers}/>
-        <Selector 
-            label="rounds"
-            onChange={handleRounds}
-            numbers={roundNumbers}/>
+        <Delete>
+            <Button 
+                text="-"
+                color={"Default-button Button-danger"}
+                onClick={remove}/>
+        </Delete>
+        Tabata: {work/100}s work, {rest/100}s rest for {rounds} rounds
         <DisplayTime
             minutes="0"
             seconds={seconds}/>
-        <Button 
+        {/* <Button 
             text={isRunning && time !== 0 ? "Pause" : "Start"}
-            onClick={startStop}/>
+            onClick={startStop}/> */}
         <Button 
             text="Reset"
-            onClick={reset}/>
-        <Button 
+            onClick={reset}
+            color={"Default-button"}/>
+        {/* <Button 
             text=">>"
-            onClick={fastForward}/>
+            onClick={fastForward}/> */}
             </Panel>
         </div>
     )

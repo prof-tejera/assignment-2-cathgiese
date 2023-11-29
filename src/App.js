@@ -1,9 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import styled from "styled-components";
+import TimerProvider from "./TimerProvider";
 
 import DocumentationView from "./views/DocumentationView";
 import TimersView from "./views/TimersView";
+import AddView from "./views/AddView";
 
 const Container = styled.div`
   background: #f0f6fb;
@@ -28,15 +30,18 @@ const Nav = () => {
 
 const App = () => {
   return (
-    <Container>
-      <Router>
-        <Nav />
-        <Routes>
-          <Route path="/docs" element={<DocumentationView />} />
-          <Route path="/" element={<TimersView />} />
-        </Routes>
-      </Router>
-    </Container>
+    <TimerProvider>
+      <Container>
+        <Router>
+          <Nav />
+          <Routes>
+            <Route path="/docs" element={<DocumentationView />} />
+            <Route path="/" element={<TimersView />} />
+            <Route path="/add" element={<AddView />} />
+          </Routes>
+        </Router>
+      </Container>
+    </TimerProvider>
   );
 };
 
