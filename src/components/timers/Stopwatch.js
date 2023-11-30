@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useState, useEffect, useContext } from "react";
 import Button from "../generic/Button/Button";
 import DisplayTime from "../generic/DisplayTime/DisplayTime";
-import Panel from "../generic/Panel";
 import { TimerContext } from '../../TimerProvider';
 
 const Delete = styled.div`
@@ -13,8 +12,7 @@ const Delete = styled.div`
 
 const Stopwatch = ({minutes, seconds, id, status}) => {
     // Store the time and button
-    // const [isRunning, setIsRunning] = useState(null);
-    const {isRunning, setIsRunning, timers, setTimers} = useContext(TimerContext)
+    const {timers, setTimers, isRunning, nextTimer, isReset} = useContext(TimerContext)
     const [time, setTime] = useState(0);
 
     // Credit for setInterval & math.floor:
@@ -22,24 +20,23 @@ const Stopwatch = ({minutes, seconds, id, status}) => {
 
      useEffect(() => {
         let intervalId;
-        if (status === "running") {
-            setIsRunning(true)
-        }   
-        if (isRunning && time <= (minutes + seconds)) {
-          // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-          intervalId = setInterval(() => setTime(time + 1), 7);
-         }
 
-         if (time >= (minutes + seconds)) {
-            // setWorkoutStatus(null);
-            setIsRunning(null);
-            const timer = timers.filter((timer) => timer.id === id)
-            timer[0].status = "complete"
-            clearInterval(intervalId);
+        if (isRunning && status === "running" && time >= 0) {
+            intervalId = setInterval(() => {setTime(time + 1)}, 7);
         }
+     
+        if (isRunning && time === (minutes+seconds) && status === "running") {
+            nextTimer()
+            setTime(0)
+        }
+
+        else if (status === "complete" || isReset){
+            setTime(0)
+        }
+
         return () => clearInterval(intervalId);
         
-      }, [isRunning, setIsRunning, time, minutes, seconds, id, status, timers]);
+      }, [isReset, isRunning, minutes, nextTimer, seconds, status, time]);
 
     
     // // Minutes calculation
@@ -48,33 +45,13 @@ const Stopwatch = ({minutes, seconds, id, status}) => {
     // Seconds calculation
     const secondsCalc = Math.floor((time % 6000) / 100);
 
-    // // Start and stop timer
-    // const startStop = () => {
-    //     if (isRunning) {
-    //         setIsRunning(null)
-    //     } else {
-    //         setIsRunning(true)
-    //     }
-    // }
-
-    const reset = () => {
-        setIsRunning(null);
-        setTime(0);
-    }
-
     const remove = () => {
         const newTimersList = timers.filter(timer => timer.id !== id)
         setTimers(newTimersList)
     }
 
-    // // Fast forward (clear) timer
-    // const fastForward = () => {
-    //     setTime(0)
-    // }
-    
     return (
         <div className="grid-container">
-        <Panel background-color="blue">
             <Delete>
                 <Button 
                     text="-"
@@ -84,19 +61,8 @@ const Stopwatch = ({minutes, seconds, id, status}) => {
             Stopwatch: {minutes/6000}m{seconds/100}s
             <DisplayTime
                 minutes={minutesCalc}
-                seconds={secondsCalc}/>
-        
-            {/* <Button 
-                text={isRunning ? "Pause" : "Start"}
-                onClick={startStop}/> */}
-            <Button 
-                text="Reset"
-                onClick={reset}
-                color={"Default-button"}/>
-            {/* <Button 
-                text=">>"
-                onClick={fastForward}/> */}
-        </Panel>
+                seconds={secondsCalc}
+                displayStyle={status === "running" ? "Default-display Running" : (status === "complete" ? "Default-display Complete" : "Default-display")}/>
         </div>
     )
 };

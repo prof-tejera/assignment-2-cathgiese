@@ -11,20 +11,24 @@
     font-weight: bold;
   }
   
-  .Default-button-active {
-    background-color: rgb(71, 145, 241);
-  }
-  
   .Default-button:hover {
-    background-color: rgb(71, 145, 241);
+    background-color: #C7E4EE
   }
 
   .Button-danger {
-    background-color: #d9534f 
+    background-color: #f08080
+  }
+
+  .Button-danger:hover {
+    background-color: #ff4d4d
   }
 
   .Button-go {
-    background-color: #4a9700
+    background-color: #AEBE92
+  }
+
+  .Button-go:hover {
+    background-color: #73BE73
   }
 
   .Button-add {

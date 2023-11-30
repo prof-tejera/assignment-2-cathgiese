@@ -1,19 +1,9 @@
 import React from "react";
+import "./DisplayTime.css";
 
-const Screen = ({ minutes, seconds }) => {
+const Screen = ({ minutes, seconds, displayStyle }) => {
     return (
-      <div
-        style={{
-          // border: "1px solid black",
-          width: 300,
-          height: 70,
-          textAlign: "center",
-          marginBottom: 10,
-          background: "white",
-          fontSize: "50px",
-          padding: "30px"
-        }}
-      >
+      <div className={displayStyle}>
         {minutes}m
         {seconds}s
       </div>

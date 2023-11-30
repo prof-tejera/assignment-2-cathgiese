@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import { TimerContext } from "../TimerProvider";
 import { Link } from "react-router-dom";
@@ -34,70 +34,35 @@ const ControlButtons = styled.div`
 
 const TimerTitle = styled.div``;
 
-
 const TimersView = () => { 
-  const {timers, 
-        setTimers,
-        isRunning,
-        setIsRunning } = useContext(TimerContext)
-  
-  const [timersList, setTimersList] = useState(timers.filter((timer) => timer.status !== "complete"))
+  const {timers, totalTime, isRunning, restart, startStop, nextTimer, isReset, setTimers} = useContext(TimerContext)
 
-  useEffect (() => {
-    console.log("timers list", timersList)
-    console.log("timers", timers)
-    // setTimersList(timers.filter((timer) => timer.status !== "complete"))
+  // Minutes calculation
+  const minutesCalc = Math.floor((totalTime % 360000) / 6000);
+ 
+  // Seconds calculation
+  const secondsCalc = Math.floor((totalTime % 6000) / 100);
 
-    if (isRunning && timers.length > 0) { 
-      setTimersList(timersList.filter((timer) => timer.status !== "complete"))
-   
-      if (timersList.length > 0) {
-        timersList[0].status = "running"
-      }
-    
-    }
-
-    // else if (!isRunning && timers.length > 0) {
-    //   console.log("error", timersList)
-    // }
-
-  }, [timers, setTimers, isRunning, timersList, setTimersList])
-
-  // Start or stop timer
-  const startStop = () => {
-    if (isRunning) {
-        setIsRunning(null)
-    } else {
-        setIsRunning(true)
-    }
+  const handleRemoval = (id) => {
+    setTimers(timers.filter(timer => timer.id !== id))
   }
-
-  // Restart timer
-  const restart = () => {
-    timers.map((timer) => timer.status = "ready")
-    setTimersList(timers)
-  }
-
-  // Fast forward (clear) timer
-  // const fastForward = () => {
-  //   setTime(0)
-  // }
 
   return (
     <ControlButtons>
       <Link to="/add"><Button text="+ Add timer" color={"Default-button Button-add"} /></Link><br></br>
       <Button 
-        text={isRunning ? "Pause timer" : "Start timer"}
-        onClick={startStop}
+        text={isRunning ? "Pause workout" : "Start workout"}
+        onClick={timers.length === 0 ? null : startStop}
         color={isRunning ? "Default-button Button-danger":"Default-button Button-go"} />
       <Button 
         text={"Skip timer >>"}
-        color={"Default-button"} />
+        color={"Default-button"}
+        onClick={timers.length === 0 ? null : nextTimer} />
       <Button 
         text={"Restart workout"}
         color={"Default-button"}
-        onClick={restart} />
-
+        onClick={timers.length === 0 ? null : restart} />
+    <h2>Total time: {minutesCalc}m{secondsCalc}s</h2>
     <Timers>
       {timers.map((timer) => (
         <Timer key={`timer-${timer.id}`}>
@@ -106,25 +71,34 @@ const TimersView = () => {
                                           id={timer.id}
                                           minutes={timer.minutes} 
                                           seconds={timer.seconds}
-                                          status={timer.status} />}
+                                          status={timer.status} 
+                                          isReset={isReset}/>}
+                                          {/* condense minutes + seconds */}
           {timer.type === "countdown" && <Countdown 
                                           id={timer.id}
                                           minutes={timer.minutes} 
                                           seconds={timer.seconds}
-                                          status={timer.status}/>}
+                                          status={timer.status}
+                                          isReset={isReset}/>}
           {timer.type === "xy" && <XY 
                                     id={timer.id}
                                     minutes={timer.minutes} 
                                     seconds={timer.seconds}
                                     rounds={timer.rounds}
-                                    status={timer.status}/>}
+                                    status={timer.status}
+                                    isReset={isReset}/>}
 
           {timer.type === "tabata" && <Tabata 
                                         id={timer.id}
                                         work={timer.work} 
                                         rest={timer.rest}
                                         rounds={timer.rounds}
-                                        status={timer.status}/>}
+                                        status={timer.status}
+                                        isReset={isReset}/>}
+          {/* <Button 
+              text={"Remove"}
+              color={"Default-button Button-danger"}
+              onClick={handleRemoval(timer.id)}/> */}
         </Timer>
       ))}
     </Timers>

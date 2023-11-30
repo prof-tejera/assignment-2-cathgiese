@@ -5,41 +5,72 @@ export const TimerContext = React.createContext({});
 
 const TimerProvider = ({ children }) => {
     const [timers, setTimers] = useState([]);
-
-    // console.log('timers', timers)
-
     const [isRunning, setIsRunning] = useState(null);
-    // const [timerStatus, setTimerStatus] = useState(null);
-    // const [workoutStatus, setWorkoutStatus] = useState(null);
+    const [totalTime, setTotalTime] = useState(0);
+    const [isReset, setIsReset] = useState(null)
 
-    const [time, setTime] = useState(0);
     // Current running timer
     const [activeTimerIndex, setActiveTimerIndex] = useState(0); 
-    // const [min, setMinutes] = useState(null);
-    // const [sec, setSeconds] = useState(null);
+    
+    const totalTimeCalc = () => {
+        const totalMin = timers.map((timer) => timer.minutes)
+        totalMin.forEach((val) => setTotalTime(totalTime+val))
+
+        const totalSec = timers.map((timer) => timer.seconds)
+        totalSec.forEach((val) => setTotalTime(totalTime+val))
+    }
     
     const nextTimer = () => {
-        console.log("active index", activeTimerIndex, "timers", timers)
-        timers[activeTimerIndex].status = "complete"
-        setActiveTimerIndex(activeTimerIndex+1)
+        if (activeTimerIndex === timers.length-1) {
+            timers[activeTimerIndex].status = "complete"
+            setTimers(timers)
+            restart()
+        }
+        else {
+            timers[activeTimerIndex].status = "complete"
+            timers[activeTimerIndex+1].status = "running"
+            setActiveTimerIndex(activeTimerIndex+1)
+            setTimers(timers)
+        }
+    }
+
+    // Restart timer
+    const restart = () => {
+        setIsReset(true)
+        setIsRunning(null)
+        setActiveTimerIndex(0)
+        timers.map((timer) => timer.status = "ready")
+        timers[0].status = "running"
         setTimers(timers)
+    }
+
+    // Start or stop timer
+    const startStop = () => {
+        if (isRunning) {
+            setIsRunning(null)
+        } else {
+            setIsRunning(true)
+            setIsReset(null)
+        }
     }
 
     return (
         <TimerContext.Provider
             value={{
-                // functions go here
                 timers,
                 setTimers,
                 isRunning,
                 setIsRunning,
-                time,
-                setTime,
+                totalTime,
+                setTotalTime,
+                totalTimeCalc,
                 activeTimerIndex,
                 setActiveTimerIndex,
-                nextTimer
-                // workoutStatus,
-                // setWorkoutStatus
+                nextTimer,
+                restart,
+                startStop,
+                isReset,
+                setIsReset,
             }}
         >{children}</TimerContext.Provider>
     )

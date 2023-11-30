@@ -1,5 +1,4 @@
-import React, { useContext } from 'react'
-import { useState } from "react";
+import React, { useContext, useState, useEffect } from 'react'
 import Button from "../generic/Button/Button";
 import Selector from "../generic/Selector/Selector";
 import { TimerContext } from '../../TimerProvider';
@@ -7,22 +6,20 @@ import { makeId } from '../../utils/helpers';
 
 const StopwatchSelect = () => { 
 
-    const {timers, setTimers} = useContext(TimerContext)
+    const {timers, setTimers, totalTime, setTotalTime} = useContext(TimerContext)
     const [minutes, setMinutes] = useState(0)
     const [seconds, setSeconds] = useState(500)
+    const [clicked, setClicked] = useState(null)
 
-    // Helper function to make sure timer is not empty
-    // const checkTimer = () => {
-    //     if(minutes === 0 && seconds === 0) {
-    //         const error = 
-    //     } else {
-    //         setTimers(
-    //             [...timers, 
-    //             {minutes: minutes,
-    //             seconds: seconds,
-    //             type: "stopwatch"}])
-    //     }
-    // } 
+    useEffect(() => {
+        let intervalId;
+        
+        if (clicked) {
+            intervalId = setInterval(() => {setClicked(null)}, 1000);
+        }
+        return () => clearInterval(intervalId);
+
+      }, [clicked, setClicked]);
 
     // Show numbers for minutes and seconds
     const minNumbersList = [...Array(60).keys()]
@@ -32,6 +29,17 @@ const StopwatchSelect = () => {
     const secNumbersList = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
      const secNumbers = secNumbersList.map(number =>
             <option value={number} key={number}>{number}</option>)
+
+    const handleTimer = () => {
+        setTimers(
+            [...timers, 
+            {id: makeId(),
+            minutes: minutes,
+            seconds: seconds,
+            type: "countdown",
+            status: timers.length === 0 ? "running" : "ready"}])
+        setTotalTime(totalTime+minutes+seconds)
+        setClicked(true)}
 
     return (
         <div className="grid-container">
@@ -44,15 +52,9 @@ const StopwatchSelect = () => {
                 onChange={e => setSeconds(e.target.value*100)}
                 numbers={secNumbers}/>
             <Button 
-                text={"Add"}
-                color={"Default-button"}
-                onClick={() => setTimers(
-                    [...timers, 
-                    {id: makeId(),
-                    minutes: minutes,
-                    seconds: seconds,
-                    type: "stopwatch",
-                    status: "ready"}])}/>
+                text={clicked ? "Added ✓" : "Add"}
+                color={clicked ? "Default-button Button-go" : "Default-button"}
+                onClick={handleTimer}/>
         </div>
     )
 };
