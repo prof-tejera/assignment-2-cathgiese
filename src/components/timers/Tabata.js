@@ -1,17 +1,11 @@
 import React from 'react'
-import styled from "styled-components";
 import { useState, useEffect, useContext } from "react";
-import Button from "../generic/Button/Button";
 import DisplayTime from "../generic/DisplayTime/DisplayTime";
 import { TimerContext } from '../../TimerProvider';
 
-const Delete = styled.div`
-  display: flex;
-  justify-content: right;`;
-
 const Tabata = ({work, rest, rounds, id, status}) => {
     // Store the time and button
-    const {timers, setTimers, isRunning, nextTimer, isReset} = useContext(TimerContext)
+    const {isRunning, nextTimer, isReset} = useContext(TimerContext)
     const [time, setTime] = useState(work);
     const [roundsCount, setRoundsCount] = useState(rounds)
     const [workStatus, setWorkStatus] = useState(true)
@@ -57,19 +51,8 @@ const Tabata = ({work, rest, rounds, id, status}) => {
     // Seconds calculation
     const seconds = Math.floor((time % 6000) / 100);
 
-    const remove = () => {
-        const newTimersList = timers.filter(timer => timer.id !== id)
-        setTimers(newTimersList)
-    }
-
     return (
     <div className="grid-container">
-        <Delete>
-            <Button 
-                text="-"
-                color={isRunning ? "hidden":"Default-button Button-danger"}
-                onClick={remove}/>
-        </Delete>
         Tabata: {work/100}s work, {rest/100}s rest for {rounds} rounds
         <DisplayTime
             minutes="0"

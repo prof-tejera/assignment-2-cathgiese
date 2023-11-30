@@ -35,7 +35,7 @@ const ControlButtons = styled.div`
 const TimerTitle = styled.div``;
 
 const TimersView = () => { 
-  const {timers, totalTime, isRunning, restart, startStop, nextTimer, isReset, setTimers} = useContext(TimerContext)
+  const {timers, totalTime, isRunning, restart, startStop, nextTimer, isReset, remove} = useContext(TimerContext)
 
   // Minutes calculation
   const minutesCalc = Math.floor((totalTime % 360000) / 6000);
@@ -43,9 +43,9 @@ const TimersView = () => {
   // Seconds calculation
   const secondsCalc = Math.floor((totalTime % 6000) / 100);
 
-  const handleRemoval = (id) => {
-    setTimers(timers.filter(timer => timer.id !== id))
-  }
+  // const handleRemoval = (id) => {
+  //   setTimers(timers.filter(timer => timer.id !== id))
+  // }
 
   return (
     <ControlButtons>
@@ -73,7 +73,6 @@ const TimersView = () => {
                                           seconds={timer.seconds}
                                           status={timer.status} 
                                           isReset={isReset}/>}
-                                          {/* condense minutes + seconds */}
           {timer.type === "countdown" && <Countdown 
                                           id={timer.id}
                                           minutes={timer.minutes} 
@@ -95,10 +94,10 @@ const TimersView = () => {
                                         rounds={timer.rounds}
                                         status={timer.status}
                                         isReset={isReset}/>}
-          {/* <Button 
+          <Button 
               text={"Remove"}
               color={"Default-button Button-danger"}
-              onClick={handleRemoval(timer.id)}/> */}
+              onClick={() => remove({id:timer.id})}/>
         </Timer>
       ))}
     </Timers>

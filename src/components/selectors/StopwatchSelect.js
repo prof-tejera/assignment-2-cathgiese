@@ -36,7 +36,7 @@ const StopwatchSelect = () => {
             {id: makeId(),
             minutes: minutes,
             seconds: seconds,
-            type: "countdown",
+            type: "stopwatch",
             status: timers.length === 0 ? "running" : "ready"}])
         setTotalTime(totalTime+minutes+seconds)
         setClicked(true)}

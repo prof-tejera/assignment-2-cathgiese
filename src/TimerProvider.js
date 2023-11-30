@@ -7,7 +7,7 @@ const TimerProvider = ({ children }) => {
     const [timers, setTimers] = useState([]);
     const [isRunning, setIsRunning] = useState(null);
     const [totalTime, setTotalTime] = useState(0);
-    const [isReset, setIsReset] = useState(null)
+    const [isReset, setIsReset] = useState(null);
 
     // Current running timer
     const [activeTimerIndex, setActiveTimerIndex] = useState(0); 
@@ -54,6 +54,50 @@ const TimerProvider = ({ children }) => {
         }
     }
 
+    // Delete from queue
+    const remove = ({id}) => {
+
+        if (timers.length === 1) {
+            setTimers([])
+        }
+
+        else {
+            const match = timers.map((timer) => timer.id === id)
+            const i = match.indexOf(true)
+
+            if (i === 0) {
+                // Update timer list
+                const newTimers = timers.slice(1)
+                newTimers[0].status = "running"
+                setTimers(newTimers)
+
+                // recalculate total time
+                const minusMin = timers.map((timer) => timer.minutes)
+                minusMin.forEach((val) => setTotalTime(totalTime-val))
+
+                const minusSec = timers.map((timer) => timer.seconds)
+                minusSec.forEach((val) => setTotalTime(totalTime-val))
+            }
+    
+            else {
+                // Update timer list
+                setTimers([
+                 ...timers.slice(0, i),
+                 ...timers.slice(i + 1),
+               ])
+
+               // recalculate total time
+               const minusMin = timers.map((timer) => timer.minutes)
+               minusMin.forEach((val) => setTotalTime(totalTime-val))
+
+               const minusSec = timers.map((timer) => timer.seconds)
+               minusSec.forEach((val) => setTotalTime(totalTime-val))
+            }
+        }
+
+        setActiveTimerIndex(0)
+    }
+
     return (
         <TimerContext.Provider
             value={{
@@ -71,6 +115,7 @@ const TimerProvider = ({ children }) => {
                 startStop,
                 isReset,
                 setIsReset,
+                remove
             }}
         >{children}</TimerContext.Provider>
     )
